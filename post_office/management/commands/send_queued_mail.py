@@ -41,20 +41,16 @@ class Command(BaseCommand):
         try:
             with FileLock(options['lockfile']):
 
-                while 1:
-                    try:
-                        send_queued(options['processes'],
-                                    options.get('log_level'))
-                    except Exception as e:
-                        logger.error(e, exc_info=sys.exc_info(),
-                                     extra={'status_code': 500})
-                        raise
+                try:
+                    send_queued(options['processes'],
+                                options.get('log_level'))
+                except Exception as e:
+                    logger.error(e, exc_info=sys.exc_info(),
+                                 extra={'status_code': 500})
+                    raise
 
-                    # Close DB connection to avoid multiprocessing errors
-                    connection.close()
-
-                    if not Email.objects.filter(status=STATUS.queued) \
-                            .filter(Q(scheduled_time__lte=now()) | Q(scheduled_time=None)).exists():
-                        break
+                # Close DB connection to avoid multiprocessing errors
+                connection.close()
+                
         except FileLocked:
             logger.info('Failed to acquire lock, terminating now.')
