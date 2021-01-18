@@ -58,6 +58,7 @@ class Command(BaseCommand):
                 }
                 Email.objects.filter(status=STATUS.sent)\
                         .update(**update_dict)
+                print("Cleared old message content")
                 
         except FileLocked:
             logger.info('Failed to acquire lock, terminating now.')
