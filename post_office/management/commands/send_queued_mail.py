@@ -52,5 +52,12 @@ class Command(BaseCommand):
                 # Close DB connection to avoid multiprocessing errors
                 connection.close()
                 
+                update_dict = {
+                    "message": "",
+                    "html_message": ""
+                }
+                Email.objects.filter(status=STATUS.sent)\
+                        .update(**update_dict)
+                
         except FileLocked:
             logger.info('Failed to acquire lock, terminating now.')
